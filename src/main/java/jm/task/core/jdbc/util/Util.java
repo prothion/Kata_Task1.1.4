@@ -14,33 +14,26 @@ import java.util.Properties;
 public class Util {
     // реализуйте настройку соеденения с БД
     private static Connection conn = null;
-    private static Util instance = null;
-    private Util() {
+    private static String url = "jdbc:mysql://localhost:3306/task1.4";
+    private static String username = "admin";
+    private static String password = "admin";
+    public static Connection getConnection() throws SQLException {
         try {
             if (null == conn || conn.isClosed()) {
-                Properties properties = getProperties();
-                conn = DriverManager.getConnection(properties.getProperty("db.url"), properties.getProperty("db.username"), properties.getProperty("db.password"));
+                conn = DriverManager.getConnection(url, username, password);
             }
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    public static Util getInstance() {
-        if (null == instance) {
-            instance = new Util();
-        }
-        return instance;
-    }
-    public Connection getConnection() {
         return conn;
     }
-    private static Properties getProperties() throws IOException {
-        Properties properties = new Properties();
-        try (InputStream openStr = Files.newInputStream(Paths.get(Util.class.getResource("/prop.properties").toURI()))) {
-            properties.load(openStr);
-            return properties;
-        } catch (IOException | URISyntaxException e) {
-            throw new IOException("Не найден properties файл!", e);
+    public static void closeConnection() {
+        try {
+            if (null != conn || !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
